@@ -1,0 +1,13 @@
+[
+  { "$match": { "languages": { "$in": ["English"] } } },
+  { "$unwind": "$cast" },
+  {
+    "$group": {
+      "_id": "$cast",
+      "numFilms": { "$sum": 1 },
+      "average": { "$avg": "$imdb.rating" }
+    }
+  },
+  { "$addFields": { "average": { "$trunc": ["$average", 1] } } },
+  {"$sort": {"numFilms": -1}}
+]

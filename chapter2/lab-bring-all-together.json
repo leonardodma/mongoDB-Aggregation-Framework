@@ -1,0 +1,44 @@
+[
+  {
+    "$match": {
+      "$and": [
+        { "languages": { "$in": ["English"] } },
+        { "imdb.rating": { "$gte": 1.0 } },
+        { "imdb.votes": { "$gte": 1.0 } },
+        { "year": { "$gte": 1990 } }
+      ]
+    }
+  },
+  {
+    "$addFields": {
+      "normalized_rating": {
+        "$let": {
+          "vars": {
+            "scaled_votes": {
+              "$add": [
+                1,
+                {
+                  "$multiply": [
+                    9,
+                    {
+                      "$divide": [
+                        { "$subtract": ["$imdb.votes", 5] },
+                        { "$subtract": [1521105, 5] }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "in": { "$avg": ["$imdb.rating", "$$scaled_votes"] }
+        }
+      }
+    }
+  },
+  {
+    "$sort": { "normalized_rating": 1 }
+  },
+  { "$project": { "title": 1 } },
+  { "$limit": 1 }
+]

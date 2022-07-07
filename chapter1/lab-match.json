@@ -1,0 +1,12 @@
+[
+  {
+    "$match": {
+      "$and": [
+        { "imdb.rating": { "$gte": 7.0 } },
+        { "genres": { "$nin": ["Crime", "Horror"] } },
+        { "rated": { "$in": ["PG", "G"] } },
+        { "languages": { "$all": ["English", "Japanese"] } }
+      ]
+    }
+  }
+]

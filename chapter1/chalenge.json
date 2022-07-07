@@ -1,0 +1,47 @@
+[
+  {
+    "$match": {
+      "$and": [
+        { "writers": { "$elemMatch": { "$exists": true } } },
+        { "directors": { "$elemMatch": { "$exists": true } } },
+        { "cast": { "$elemMatch": { "$exists": true } } }
+      ]
+    }
+  },
+  {
+    "$project": {
+      "_id": 0,
+      "cast": 1,
+      "directors": 1,
+      "writers": {
+        "$map": {
+          "input": "$writers",
+          "as": "writer",
+          "in": {
+            "$arrayElemAt": [
+              {
+                "$split": ["$$writer", " ("]
+              },
+              0
+            ]
+          }
+        }
+      }
+    }
+  },
+  {
+    "$project": {
+      "cast": 1,
+      "directors": 1,
+      "writers": 1,
+      "size_intersection": {
+        "$size": { "$setIntersection": ["$cast", "$directors", "$writers"] }
+      }
+    }
+  },
+  {
+    "$match": {
+      "size_intersection": { "$gte": 1 }
+    }
+  }
+]

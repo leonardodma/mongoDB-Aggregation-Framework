@@ -1,0 +1,47 @@
+[
+  {
+    "$match": {
+      "awards": { "$exists": true, "$ne": null }
+    }
+  },
+  {
+    "$addFields": {
+      "oscars": {
+        "$let": {
+          "vars": {
+            "won": { "$arrayElemAt": [{ "$split": ["$awards", " "] }, 0] },
+            "numOscars": {
+              "$arrayElemAt": [{ "$split": ["$awards", " "] }, 1]
+            },
+            "award": { "$arrayElemAt": [{ "$split": ["$awards", " "] }, 2] }
+          },
+          "in": {
+            "$cond": [
+              {
+                "$and": [
+                  {
+                    "$eq": ["$$won", "Won"]
+                  }
+                ]
+              },
+              {
+                "$toInt": "$$numOscars"
+              },
+              0
+            ]
+          }
+        }
+      }
+    }
+  },
+  { "$match": { "oscars": { "$gte": 1 } } },
+  {
+    "$group": {
+      "_id": null,
+      "highest_rating": { "$max": "$imdb.rating" },
+      "lowest_rating": { "$min": "$imdb.rating" },
+      "avarage_rating": { "$avg": "$imdb.rating" },
+      "deviation": { "$stdDevSamp": "$imdb.rating" }
+    }
+  }
+]

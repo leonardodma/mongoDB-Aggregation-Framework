@@ -1,0 +1,12 @@
+[
+  {
+    "$project": {
+      "_id": 0,
+      "title": 1,
+      "words_cnt": { "$size": { "$split": ["$title", " "] } }
+    }
+  },
+  {
+    "$match": { "words_cnt": { "$eq": 1 } }
+  }
+]
